@@ -7,9 +7,9 @@ RUN apt-get update && apt-get install -y curl git
 RUN curl -fsSL https://ollama.com/install.sh | sh
 
 # Preload model
-RUN ollama pull nomic-embed-text:latest
-RUN ollama pull llama3.2:1b
-RUN ollama pull qwen3:8b
+# RUN ollama pull nomic-embed-text:latest
+# RUN ollama pull llama3.2:1b
+# RUN ollama pull qwen3:8b
 
 # Copy your app
 WORKDIR /app
@@ -22,4 +22,9 @@ RUN pip install -r requirements.txt
 EXPOSE 7860 11434
 
 # Run both Ollama and Streamlit
-CMD ollama serve & python run.py --server.port=7860 --server.address=0.0.0.0
+# Start Ollama server, pull model, and run Streamlit app
+CMD ollama serve & \
+    sleep 5 && \
+    ollama pull nomic-embed-text && \
+    ollama pull llama3.2:1b && \
+    python run.py --server.port=7860 --server.address=0.0.0.0
