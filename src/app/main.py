@@ -1,12 +1,3 @@
-"""
-Streamlit application for PDF-based Retrieval-Augmented Generation (RAG)
-using Ollama + LangChain, with an integrated login page.
-
-This application allows users to upload a PDF, process it,
-and then ask questions about the content using a selected language model,
-after successful authentication.
-"""
-
 import streamlit as st
 import logging
 import os
@@ -32,6 +23,8 @@ from typing import List, Tuple, Dict, Any, Optional
 
 # Set protobuf environment variable to avoid error messages
 os.environ["PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION"] = "python"
+
+OLLAMA_HOST = "https://zi5y15rsjgj4sx-11434.proxy.runpod.net/"
 
 # Define persistent directory for ChromaDB
 PERSIST_DIRECTORY = os.path.join("data", "vectors")
@@ -242,7 +235,7 @@ def create_vector_db(file_upload) -> Chroma:
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=7500, chunk_overlap=100)
     chunks = text_splitter.split_documents(data)
     logger.info("Document split into chunks")
-    embeddings = OllamaEmbeddings(model="nomic-embed-text")
+    embeddings = OllamaEmbeddings(model="nomic-embed-text", base_url=OLLAMA_HOST)
     # Ensure PERSIST_DIRECTORY exists
     if not os.path.exists(PERSIST_DIRECTORY):
         os.makedirs(PERSIST_DIRECTORY)
@@ -260,7 +253,7 @@ def create_vector_db(file_upload) -> Chroma:
 
 def process_question(question: str, vector_db: Chroma, selected_model: str) -> str:
     logger.info(f"Processing question: {question} using model: {selected_model}")
-    llm = ChatOllama(model=selected_model)
+    llm = ChatOllama(model=selected_model, base_url=OLLAMA_HOST)
     QUERY_PROMPT = PromptTemplate(
         input_variables=["question"],
         template="""You are an AI language model assistant. Your task is to generate 2
@@ -344,8 +337,12 @@ def rag_application():
     if "user_email" in st.session_state:
         st.sidebar.success(f"Logged in as: {st.session_state['user_email']}")
 
-    models_info = ollama.list()
-    available_models = extract_model_names(models_info)
+    # os.environ["OLLAMA_HOST"] = ollama_host
+
+    # models_info = ollama.list()
+    client = ollama.Client(host=OLLAMA_HOST)
+    models_info_raw = client.list()
+    available_models = extract_model_names(models_info_raw)
     col1, col2 = st.columns([1.5, 2])
 
     if "messages" not in st.session_state:
@@ -438,7 +435,9 @@ def rag_application():
 
                             st.session_state["vector_db"] = Chroma.from_documents(
                                 documents=chunks,
-                                embedding=OllamaEmbeddings(model="nomic-embed-text"),
+                                embedding=OllamaEmbeddings(
+                                    model="nomic-embed-text", base_url=OLLAMA_HOST
+                                ),
                                 persist_directory=PERSIST_DIRECTORY,
                                 collection_name="sample_pdf_collection",  # Use a fixed name for sample
                             )
@@ -467,16 +466,6 @@ def rag_application():
             key="pdf_uploader",
         )
         if file_upload:
-            # if (
-            #     st.session_state.get("file_upload_id") != file_upload.id
-            # ):  # New file uploaded
-            #     if st.session_state["vector_db"] is not None:
-            #         logger.info("New file uploaded, deleting existing vector DB.")
-            #         # st.session_state["vector_db"].delete_collection() # This might error
-            #         st.session_state["vector_db"] = None
-            #     st.session_state["pdf_pages"] = None
-            #     st.session_state["file_upload_id"] = file_upload.id  # Store new file id
-
             if st.session_state["vector_db"] is None:
                 with col1.status(
                     "Processing uploaded PDF...", expanded=True
