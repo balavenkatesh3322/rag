@@ -21,3 +21,199 @@ Deep Learning (DL) is a subset of ML that uses neural networks with multiple lay
 LLMs (Large Language Models) are advanced models trained on massive datasets capable of performing a variety of NLP tasks. Generative AI, such as GPT or LLaVA, can be fine-tuned for video and gesture-based understanding with minimal data.
 
 Why LLM for AID: Unlike traditional ML/DL, LLMs are pretrained on massive datasets, making them more effective for tasks like sign-to-text transcription even with limited training data. This reduces the need for large-scale annotation and training.
+
+
+
+graph TD
+    %% Layer 1: System Startup
+    A[User Opens App] --> B[System Init]
+    B --> C[Load Interface]
+    C --> D[Avatar Welcome]
+    
+    %% Layer 2: User Setup
+    D --> E{Ready?}
+    E -->|No| F[Instructions]
+    F --> E
+    E -->|Yes| G[Select Form]
+    
+    %% Layer 3: Input Setup
+    G --> H[Config Fields]
+    H --> I[Init Camera]
+    I --> J{Input Type?}
+    J -->|Live| K[Camera Feed]
+    J -->|Upload| L[Video File]
+    
+    %% Layer 4: Video Processing
+    K --> M[Capture Stream]
+    L --> M
+    M --> N[Preprocess]
+    N --> O[Enhance Image]
+    
+    %% Layer 5: Detection
+    O --> P[Detect Hands]
+    P --> Q{Found?}
+    Q -->|No| R[Show Error]
+    R --> S[Reposition]
+    S --> M
+    Q -->|Yes| T[Extract Features]
+    
+    %% Layer 6: AI Recognition
+    T --> U[Normalize]
+    U --> V[AI Model]
+    V --> W[Classify Sign]
+    W --> X[Check Confidence]
+    X --> Y{Valid?}
+    Y -->|No| Z[Repeat Sign]
+    Z --> M
+    
+    %% Layer 7: Translation
+    Y -->|Yes| AA[Sign to Text]
+    AA --> BB[Context Analysis]
+    BB --> CC[Map to Field]
+    CC --> DD{Field Type?}
+    DD -->|Name| EE[Name Field]
+    DD -->|Address| FF[Address Field]
+    DD -->|Phone| GG[Phone Field]
+    DD -->|Email| HH[Email Field]
+    
+    %% Layer 8: Form Fill
+    EE --> II[Auto Fill]
+    FF --> II
+    GG --> II
+    HH --> II
+    II --> JJ[Display Result]
+    JJ --> KK{Confirm?}
+    KK -->|No| LL[Clear Field]
+    LL --> M
+    
+    %% Layer 9: Progress
+    KK -->|Yes| MM[Save Entry]
+    MM --> NN{More Fields?}
+    NN -->|Yes| OO[Next Field]
+    OO --> M
+    
+    %% Layer 10: Review
+    NN -->|No| PP[Review Form]
+    PP --> QQ[Show Summary]
+    QQ --> RR{Final OK?}
+    RR -->|No| SS[Edit Fields]
+    SS --> M
+    
+    %% Layer 11: Complete
+    RR -->|Yes| TT[Submit Form]
+    TT --> UU[Success]
+    UU --> VV[Thank User]
+    VV --> WW[End Session]
+
+    %% Subgraphs for organization
+    subgraph SYS[System Layer]
+        A
+        B
+        C
+        D
+    end
+    
+    subgraph SETUP[Setup Layer]
+        E
+        F
+        G
+        H
+        I
+    end
+    
+    subgraph INPUT[Input Layer]
+        J
+        K
+        L
+        M
+        N
+        O
+    end
+    
+    subgraph DETECT[Detection Layer]
+        P
+        Q
+        R
+        S
+        T
+    end
+    
+    subgraph AI[AI Layer]
+        U
+        V
+        W
+        X
+        Y
+        Z
+    end
+    
+    subgraph TRANSLATE[Translation Layer]
+        AA
+        BB
+        CC
+        DD
+        EE
+        FF
+        GG
+        HH
+    end
+    
+    subgraph FORM[Form Layer]
+        II
+        JJ
+        KK
+        LL
+        MM
+    end
+    
+    subgraph REVIEW[Review Layer]
+        NN
+        OO
+        PP
+        QQ
+        RR
+        SS
+    end
+    
+    subgraph COMPLETE[Complete Layer]
+        TT
+        UU
+        VV
+        WW
+    end
+
+    %% Key process styling
+    style A fill:#FF6B6B,stroke:#333,stroke-width:2px,color:#fff
+    style D fill:#4ECDC4,stroke:#333,stroke-width:2px,color:#fff
+    style V fill:#96CEB4,stroke:#333,stroke-width:2px,color:#fff
+    style AA fill:#DDA0DD,stroke:#333,stroke-width:2px,color:#fff
+    style II fill:#FD79A8,stroke:#333,stroke-width:2px,color:#fff
+    style TT fill:#00B894,stroke:#333,stroke-width:2px,color:#fff
+    style WW fill:#F8B500,stroke:#333,stroke-width:2px,color:#fff
+    
+    %% Decision nodes
+    style E fill:#FFD93D,stroke:#333,stroke-width:2px,color:#333
+    style J fill:#FF8A80,stroke:#333,stroke-width:2px,color:#333
+    style Q fill:#81C784,stroke:#333,stroke-width:2px,color:#333
+    style Y fill:#64B5F6,stroke:#333,stroke-width:2px,color:#333
+    style DD fill:#BA68C8,stroke:#333,stroke-width:2px,color:#333
+    style KK fill:#4DB6AC,stroke:#333,stroke-width:2px,color:#333
+    style NN fill:#FFB74D,stroke:#333,stroke-width:2px,color:#333
+    style RR fill:#F06292,stroke:#333,stroke-width:2px,color:#333
+    
+    %% Field types
+    style EE fill:#87CEEB,stroke:#333,stroke-width:1px,color:#333
+    style FF fill:#98FB98,stroke:#333,stroke-width:1px,color:#333
+    style GG fill:#DDA0DD,stroke:#333,stroke-width:1px,color:#333
+    style HH fill:#F0E68C,stroke:#333,stroke-width:1px,color:#333
+    
+    %% Subgraph styling
+    style SYS fill:#FFE8E8,stroke:#FF6B6B,stroke-width:2px
+    style SETUP fill:#E0F7FA,stroke:#4ECDC4,stroke-width:2px
+    style INPUT fill:#F3E5F5,stroke:#9C27B0,stroke-width:2px
+    style DETECT fill:#E8F5E8,stroke:#4CAF50,stroke-width:2px
+    style AI fill:#FFF3E0,stroke:#FF9800,stroke-width:2px
+    style TRANSLATE fill:#F1F8E9,stroke:#8BC34A,stroke-width:2px
+    style FORM fill:#FCE4EC,stroke:#E91E63,stroke-width:2px
+    style REVIEW fill:#F0F4C3,stroke:#CDDC39,stroke-width:2px
+    style COMPLETE fill:#E0F2F1,stroke:#009688,stroke-width:2px
