@@ -1,0 +1,23 @@
+Project Name: AID (AI-based Sign Language Interpretation System)
+
+Overview
+
+The goal of this project is to develop an application that can interpret sign language from user-recorded videos and automatically fill out corresponding form fields based on the interpreted signs. To achieve this, we are building an AI model that recognizes sign gestures and translates them into text. This document tracks the research and exploration progress as we build toward that goal.
+
+Objective
+
+To build a system capable of recognizing sign language from user-recorded videos and auto-filling forms using the interpreted sign text. The core challenge is developing or fine-tuning a model that accurately detects and transcribes sign gestures to text.
+
+Research Strategy
+
+Focus: Understand state-of-the-art models for sign language recognition.Method: Evaluate publicly available research papers, datasets, and code repositories. Document insights and implement experiments based on findings.
+
+ML, DL, and LLM Overview
+
+Machine Learning (ML) focuses on using algorithms that improve with experience. Common algorithms include SVM, Decision Trees, and KNN.
+
+Deep Learning (DL) is a subset of ML that uses neural networks with multiple layers. Widely used architectures include CNNs, RNNs, LSTM, and Transformers.
+
+LLMs (Large Language Models) are advanced models trained on massive datasets capable of performing a variety of NLP tasks. Generative AI, such as GPT or LLaVA, can be fine-tuned for video and gesture-based understanding with minimal data.
+
+Why LLM for AID: Unlike traditional ML/DL, LLMs are pretrained on massive datasets, making them more effective for tasks like sign-to-text transcription even with limited training data. This reduces the need for large-scale annotation and training.
