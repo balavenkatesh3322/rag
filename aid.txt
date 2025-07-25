@@ -135,3 +135,23 @@ A scalable and centralized data management strategy is essential. We need a robu
 Proposed Solution: Utilize a cloud storage service like Amazon S3 (Simple Storage Service) buckets. This provides a scalable, durable, and highly available solution for managing our data assets.
 
 Action Item: Ashlin will have a conversation with the team to define the data storage architecture, folder structures, and access policies.
+
+
+4. Auto Hyperparameter Tuning ⚙️
+To quickly achieve good accuracy for our deep learning embedding and transformer models, automating the hyperparameter tuning process is crucial. Manually searching for optimal hyperparameters is time-consuming and often suboptimal.
+
+Proposed Solution: We will leverage automated hyperparameter optimization frameworks. Optuna is a strong candidate due to its define-by-run API, which allows for dynamic construction of search spaces.
+
+Benefits and Examples of Optuna and Other Tools:
+
+Optuna:
+
+Define-by-Run API: This allows for dynamic search space definition, meaning you can define the search space based on previous trials. For example, if a certain learning rate range performs poorly, Optuna can dynamically adjust the next trials to explore different ranges.
+
+Pruning: Optuna supports pruning of unpromising trials, which stops training early for models that are clearly not performing well, saving computational resources. For instance, if a model's validation accuracy plateaus early, Optuna can terminate that trial.
+
+Visualization: Provides powerful visualization tools to understand the search process and the relationship between hyperparameters and performance.
+
+Example: Optimizing a transformer model's learning rate, number of attention heads, and hidden layer sizes. Optuna can efficiently explore thousands of combinations to find the best performing set.
+
+
