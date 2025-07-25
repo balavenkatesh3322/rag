@@ -127,3 +127,11 @@ Capabilities: We can use it to create bounding boxes, polygons, and skeletal key
 
 4. Real-time Prediction Pipeline ⚙️
 The final challenge is to assemble the components into a seamless, end-to-end pipeline for real-time prediction. This involves setting up a system that can handle a live video stream from a user's camera, feed it to the model for inference, and return the interpreted text with minimal latency. This requires efficient data processing and model optimization to ensure a smooth user experience.
+
+
+4. Cloud Data Storage and Management ☁️
+A scalable and centralized data management strategy is essential. We need a robust solution to store all project-related data, which includes the large video datasets required for training as well as the real-time videos uploaded by users for interpretation.
+
+Proposed Solution: Utilize a cloud storage service like Amazon S3 (Simple Storage Service) buckets. This provides a scalable, durable, and highly available solution for managing our data assets.
+
+Action Item: Ashlin will have a conversation with the team to define the data storage architecture, folder structures, and access policies.
