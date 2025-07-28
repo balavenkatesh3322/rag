@@ -1,0 +1,11 @@
+# requirements.txt
+tensorflow>=2.8.0
+opencv-python
+mediapipe
+pandas
+numpy
+matplotlib
+seaborn
+scikit-learn
+mlflow
+tqdm
