@@ -1,0 +1,254 @@
+# organize_data.py
+"""
+Script to organize sign language videos into class-based folders
+and analyze the dataset distribution
+"""
+
+import os
+import shutil
+import re
+from collections import Counter
+import argparse
+
+def organize_videos_by_class(source_dir, target_dir):
+    """
+    Organize videos into class-based folders based on filename prefix
+    
+    Args:
+        source_dir (str): Path to directory containing all videos
+        target_dir (str): Path to directory where organized data will be stored
+    """
+    
+    # Create target directory if it doesn't exist
+    os.makedirs(target_dir, exist_ok=True)
+    
+    # Get all video files
+    video_files = [f for f in os.listdir(source_dir) 
+                   if f.lower().endswith(('.mp4', '.mov', '.avi', '.mkv'))]
+    
+    print(f"Found {len(video_files)} video files")
+    
+    # Organize files by class
+    class_counts = Counter()
+    
+    for video_file in video_files:
+        # Extract class name (everything before the first underscore)
+        match = re.match(r'^([^-_]+)', video_file)
+        if match:
+            class_name = match.group(1).upper()  # Convert to uppercase for consistency
+        else:
+            # If no underscore found, use the entire filename without extension
+            class_name = os.path.splitext(video_file)[0].split('_')[0].upper()
+        
+        # Create class directory
+        class_dir = os.path.join(target_dir, class_name)
+        os.makedirs(class_dir, exist_ok=True)
+        
+        # Move file to class directory
+        source_path = os.path.join(source_dir, video_file)
+        target_path = os.path.join(class_dir, video_file)
+        
+        # Copy file (use shutil.move() if you want to move instead of copy)
+        shutil.copy2(source_path, target_path)
+        
+        # Update counter
+        class_counts[class_name] += 1
+    
+    print(f"Organized videos into {len(class_counts)} classes")
+    return class_counts
+
+def save_class_summary(class_counts, output_file):
+    """
+    Save class distribution summary to a file
+    
+    Args:
+        class_counts (Counter): Counter object with class counts
+        output_file (str): Path to output file
+    """
+    with open(output_file, 'w') as f:
+        f.write("Class Distribution Summary\n")
+        f.write("=" * 30 + "\n")
+        f.write(f"Total Classes: {len(class_counts)}\n")
+        f.write(f"Total Videos: {sum(class_counts.values())}\n\n")
+        f.write("Class Name\t\tCount\n")
+        f.write("-" * 30 + "\n")
+        
+        for class_name, count in sorted(class_counts.items()):
+            f.write(f"{class_name:<20}\t{count}\n")
+    
+    print(f"Class summary saved to {output_file}")
+
+def main():
+    parser = argparse.ArgumentParser(description='Organize sign language videos by class')
+    parser.add_argument('--source_dir', type=str, required=True,
+                       help='Path to directory containing all videos')
+    parser.add_argument('--target_dir', type=str, required=True,
+                       help='Path to directory where organized data will be stored')
+    parser.add_argument('--summary_file', type=str, default='class_summary.txt',
+                       help='Path to save class summary file')
+    
+    args = parser.parse_args()
+    
+    # Organize videos
+    class_counts = organize_videos_by_class(args.source_dir, args.target_dir)
+    
+    # Save summary
+    save_class_summary(class_counts, args.summary_file)
+    
+    # Print summary
+    print("\nClass Distribution:")
+    print("=" * 30)
+    for class_name, count in sorted(class_counts.items()):
+        print(f"{class_name}: {count} videos")
+
+if __name__ == "__main__":
+    main()
+
+
+
+
+
+# visualize_data.py
+"""
+Script to visualize sign language dataset distribution
+"""
+
+import os
+import json
+import matplotlib.pyplot as plt
+import seaborn as sns
+import pandas as pd
+from collections import Counter
+import argparse
+
+def analyze_dataset(data_dir):
+    """
+    Analyze dataset and return class distribution
+    
+    Args:
+        data_dir (str): Path to organized dataset directory
+    
+    Returns:
+        dict: Dictionary with class names and counts
+    """
+    class_counts = {}
+    
+    for class_name in os.listdir(data_dir):
+        class_path = os.path.join(data_dir, class_name)
+        if os.path.isdir(class_path):
+            video_count = len([f for f in os.listdir(class_path) 
+                              if f.lower().endswith(('.mp4', '.mov', '.avi', '.mkv'))])
+            class_counts[class_name] = video_count
+    
+    return class_counts
+
+def create_visualizations(class_counts, output_dir):
+    """
+    Create visualizations for dataset analysis
+    
+    Args:
+        class_counts (dict): Dictionary with class names and counts
+        output_dir (str): Directory to save visualizations
+    """
+    os.makedirs(output_dir, exist_ok=True)
+    
+    # Convert to DataFrame for easier handling
+    df = pd.DataFrame(list(class_counts.items()), columns=['Class', 'Count'])
+    df = df.sort_values('Count', ascending=False)
+    
+    # 1. Class distribution bar plot
+    plt.figure(figsize=(15, 10))
+    sns.barplot(data=df, x='Count', y='Class', palette='viridis')
+    plt.title('Sign Language Dataset - Class Distribution', fontsize=16)
+    plt.xlabel('Number of Videos', fontsize=12)
+    plt.ylabel('Sign Classes', fontsize=12)
+    plt.tight_layout()
+    plt.savefig(os.path.join(output_dir, 'class_distribution.png'), dpi=300, bbox_inches='tight')
+    plt.show()
+    
+    # 2. Class count histogram
+    plt.figure(figsize=(12, 6))
+    plt.hist(df['Count'], bins=20, edgecolor='black', alpha=0.7)
+    plt.title('Distribution of Videos per Class', fontsize=16)
+    plt.xlabel('Number of Videos', fontsize=12)
+    plt.ylabel('Number of Classes', fontsize=12)
+    plt.grid(axis='y', alpha=0.3)
+    plt.tight_layout()
+    plt.savefig(os.path.join(output_dir, 'videos_per_class_histogram.png'), dpi=300, bbox_inches='tight')
+    plt.show()
+    
+    # 3. Pie chart for top classes
+    top_classes = df.head(20)  # Top 20 classes
+    others_count = df.tail(len(df)-20)['Count'].sum() if len(df) > 20 else 0
+    
+    if others_count > 0:
+        pie_data = list(top_classes['Count']) + [others_count]
+        pie_labels = list(top_classes['Class']) + ['Others']
+    else:
+        pie_data = top_classes['Count']
+        pie_labels = top_classes['Class']
+    
+    plt.figure(figsize=(12, 12))
+    plt.pie(pie_data, labels=pie_labels, autopct='%1.1f%%', startangle=90)
+    plt.title('Top Sign Classes Distribution', fontsize=16)
+    plt.axis('equal')
+    plt.tight_layout()
+    plt.savefig(os.path.join(output_dir, 'top_classes_pie.png'), dpi=300, bbox_inches='tight')
+    plt.show()
+    
+    # 4. Statistics summary
+    total_classes = len(df)
+    total_videos = df['Count'].sum()
+    mean_videos = df['Count'].mean()
+    median_videos = df['Count'].median()
+    std_videos = df['Count'].std()
+    
+    print("Dataset Statistics:")
+    print("=" * 30)
+    print(f"Total Classes: {total_classes}")
+    print(f"Total Videos: {total_videos}")
+    print(f"Mean Videos per Class: {mean_videos:.2f}")
+    print(f"Median Videos per Class: {median_videos:.2f}")
+    print(f"Std Deviation: {std_videos:.2f}")
+    print(f"Min Videos in Class: {df['Count'].min()}")
+    print(f"Max Videos in Class: {df['Count'].max()}")
+    
+    # Save statistics
+    stats = {
+        'total_classes': total_classes,
+        'total_videos': total_videos,
+        'mean_videos_per_class': mean_videos,
+        'median_videos_per_class': median_videos,
+        'std_deviation': std_videos,
+        'min_videos_per_class': int(df['Count'].min()),
+        'max_videos_per_class': int(df['Count'].max())
+    }
+    
+    with open(os.path.join(output_dir, 'dataset_statistics.json'), 'w') as f:
+        json.dump(stats, f, indent=2)
+    
+    return df
+
+def main():
+    parser = argparse.ArgumentParser(description='Visualize sign language dataset distribution')
+    parser.add_argument('--data_dir', type=str, required=True,
+                       help='Path to organized dataset directory')
+    parser.add_argument('--output_dir', type=str, default='visualizations',
+                       help='Directory to save visualizations')
+    
+    args = parser.parse_args()
+    
+    # Analyze dataset
+    print("Analyzing dataset...")
+    class_counts = analyze_dataset(args.data_dir)
+    
+    # Create visualizations
+    print("Creating visualizations...")
+    df = create_visualizations(class_counts, args.output_dir)
+    
+    # Save detailed class information
+    df.to_csv(os.path.join(args.output_dir, 'class_distribution.csv'), index=False)
+    print(f"Visualizations saved to {args.output_dir}")
+
+if __name__ == "__main__":
+    main()
